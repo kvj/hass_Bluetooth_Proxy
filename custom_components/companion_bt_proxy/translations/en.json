@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "New Integration",
+        "data": {
+          "name": "Name",
+          "webhook": "Webhook ID",
+          "webhook_url": "Webhook URL (Copy to your Companion App)"
+        }
+      }
+    },
+    "error": {
+    }
+  }
+}
