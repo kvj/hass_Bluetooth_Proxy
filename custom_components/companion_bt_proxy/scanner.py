@@ -8,7 +8,8 @@ _LOGGER = logging.getLogger(__name__)
 class CompanionBLEScanner(bluetooth.BaseHaRemoteScanner):
 
     def __init__(self, hass, entry):
-        super().__init__(hass, entry.entry_id, entry.title, bluetooth.async_get_advertisement_callback(hass), None, False)
+        self._connector = bluetooth.HaBluetoothConnector(client=None, source=entry.entry_id, can_connect=lambda: False)
+        super().__init__(entry.entry_id, entry.title, self._connector, False)
 
     async def async_process_json(self, data: dict):
         service_data = {key: base64.b64decode(value) for (key, value) in data.get("service_data", {}).items()}

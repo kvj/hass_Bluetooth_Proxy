@@ -41,10 +41,6 @@ async def async_setup_entry(hass: HomeAssistant, entry):
     hass.data[DOMAIN]["scanners"][entry.entry_id] = scanner
     webhook.async_register(hass, DOMAIN, "Companion BT Proxy", hook_id, _async_handle_webhook)
 
-    # coordinator = Coordinator(hass, entry)
-    # hass.data[DOMAIN]["devices"][entry.entry_id] = coordinator
-    # entry.async_on_unload(entry.add_update_listener(_async_update_entry))
-
     for p in PLATFORMS:
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(entry, p)
