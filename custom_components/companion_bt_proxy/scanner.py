@@ -10,6 +10,7 @@ class CompanionBLEScanner(bluetooth.BaseHaRemoteScanner):
     def __init__(self, hass, entry):
         self._connector = bluetooth.HaBluetoothConnector(client=None, source=entry.entry_id, can_connect=lambda: False)
         super().__init__(entry.entry_id, entry.title, self._connector, False)
+        self._sensors = []
 
     async def async_process_json(self, data: dict):
         service_data = {key: base64.b64decode(value) for (key, value) in data.get("service_data", {}).items()}
@@ -27,8 +28,13 @@ class CompanionBLEScanner(bluetooth.BaseHaRemoteScanner):
             advertisement_monotonic_time=data.get("timestamp"),
         )
 
+    async def async_update_sensors(self):
+        for s in self._sensors:
+            await s.async_on_scanner_update(self)
+
     async def async_load(self, hass):
         self._unload_callback = bluetooth.async_register_scanner(hass, self, False)
 
     async def async_unload(self, hass):
         self._unload_callback()
+        self._sensors = []

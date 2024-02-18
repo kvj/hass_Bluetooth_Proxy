@@ -28,6 +28,7 @@ async def _async_handle_webhook(hass, webhook_id, request):
     if scanner := hass.data[DOMAIN]["scanners"].get(hass.data[DOMAIN]["webhooks"].get(webhook_id)):
         for item in message:
             await scanner.async_process_json(item)
+        await scanner.async_update_sensors()
     else:
         _LOGGER.warning(f"No scanner registered for webhook {webhook_id}")
     return json_response([])
@@ -40,6 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, entry):
     await scanner.async_load(hass)
     hass.data[DOMAIN]["scanners"][entry.entry_id] = scanner
     webhook.async_register(hass, DOMAIN, "Companion BT Proxy", hook_id, _async_handle_webhook)
+    _LOGGER.debug(f"async_setup_entry() Webhook: {hook_id}")
 
     for p in PLATFORMS:
         hass.async_create_task(

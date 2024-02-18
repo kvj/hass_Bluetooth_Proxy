@@ -1,2 +1,2 @@
 DOMAIN = "companion_bt_proxy"
-PLATFORMS = []
+PLATFORMS = ["sensor"]
