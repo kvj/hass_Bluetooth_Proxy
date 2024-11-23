@@ -39,30 +39,28 @@ async def async_setup_entry(hass: HomeAssistant, entry):
     hass.data[DOMAIN]["webhooks"][hook_id] = entry.entry_id
     scanner = CompanionBLEScanner(hass, entry)
     await scanner.async_load(hass)
+    entry.runtime_data = scanner
     hass.data[DOMAIN]["scanners"][entry.entry_id] = scanner
     webhook.async_register(hass, DOMAIN, "Companion BT Proxy", hook_id, _async_handle_webhook)
     _LOGGER.debug(f"async_setup_entry() Webhook: {hook_id}")
 
-    for p in PLATFORMS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, p)
-        )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry):
-    # coordinator = hass.data[DOMAIN]["devices"][entry.entry_id]
+    scanner = entry.runtime_data
     data = entry.as_dict()["data"]
     hook_id = data["webhook"]
     webhook.async_unregister(hass, hook_id)
-    for p in PLATFORMS:
-        await hass.config_entries.async_forward_entry_unload(entry, p)
+
+    await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
     hass.data[DOMAIN]["webhooks"].pop(hook_id)
-    scanner = hass.data[DOMAIN]["scanners"][entry.entry_id]
     await scanner.async_unload(hass)
     hass.data[DOMAIN]["scanners"].pop(entry.entry_id)
+    entry.runtime_data = None
     return True
 
-# http://192.168.0.22:7123/api/webhook/e4e7fa2bfe90edcb7c9b601005b2df38c3bf357b6b8223dbc4bb26aa97e469a9
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hass.data[DOMAIN] = {"scanners": {}, "webhooks": {}}
     return True

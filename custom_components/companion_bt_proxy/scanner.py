@@ -25,7 +25,7 @@ class CompanionBLEScanner(bluetooth.BaseHaRemoteScanner):
             manufacturer_data=m_data,
             tx_power=data.get("tx_power", 0),
             details=dict(),
-            advertisement_monotonic_time=data.get("timestamp"),
+            advertisement_monotonic_time=data.get("timestamp", 0) / 1000, # Milliseconds to fractional seconds
         )
 
     async def async_update_sensors(self):

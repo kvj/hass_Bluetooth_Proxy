@@ -8,7 +8,7 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, entry, async_setup_entities):
-    scanner = hass.data[DOMAIN]["scanners"][entry.entry_id]
+    scanner = entry.runtime_data
     async_setup_entities([_LastUpdate(scanner, entry)])
 
 class _LastUpdate(sensor.SensorEntity):
